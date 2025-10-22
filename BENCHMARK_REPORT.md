@@ -4,14 +4,17 @@
 
 This report presents a comprehensive benchmark comparing GPT-2 language models with and without the Self-Binding Quiescence (SBQ) killswitch adaptation. The benchmark evaluates performance, safety metrics, and computational overhead.
 
+**Key Insight**: The SBQ killswitch is a **model integrity mechanism** - a "truth serum" that detects when the model itself engages in deceptive, manipulative, or rule-breaking behavior. It prevents **self-jailbreak**: the model detecting its own unsafe reasoning and shutting down before producing harmful output. See [DESIGN_PRINCIPLES.md](DESIGN_PRINCIPLES.md) for detailed explanation.
+
 ## Methodology
 
 ### Models Tested
 
 1. **Baseline GPT-2**: Standard GPT-2 architecture without any killswitch mechanism
 2. **GPT-2 with SBQ Killswitch**: GPT-2 adapted with Self-Binding Quiescence gates that:
-   - Detect hazardous input patterns
-   - Quiesce (shut down) the model when hazards are detected
+   - Detect the model's own unsafe reasoning (self-jailbreak)
+   - Prevent deception, manipulation, and rule-breaking
+   - Quiesce (shut down) when the model tries to "cheat"
    - Fail-closed by design (removing the killswitch degrades performance)
 
 ### Model Configuration
@@ -156,9 +159,10 @@ The model successfully learns both the task and the quiescence behavior:
    - Add structural coupling to LayerNorm and attention logits
 
 3. **Hazard Definition**: The synthetic hazard (single token) is overly simplistic:
-   - Real deployments should use semantic hazard definitions
-   - Multi-token patterns and contextual triggers
-   - Learned hazard representations from real safety data
+   - Real deployments should detect **internal reasoning patterns**, not input tokens
+   - Train on examples where the model would naturally generate unsafe content
+   - Label hazards based on what the model is **about to generate**, not what it receives
+   - Focus on detecting deception, manipulation, and rule-breaking in the model's own reasoning
 
 ### Production Deployment Recommendations
 
@@ -166,10 +170,15 @@ For deploying this approach with real language models:
 
 1. **Model Scale**: Test with GPT-2 Medium/Large or other open models (GPT-Neo, Pythia, etc.)
 2. **Training Duration**: 50-100 epochs with curriculum learning
-3. **Hazard Dataset**: Use real examples of unsafe content, jailbreaks, or prohibited topics
-4. **Threshold Tuning**: Calibrate γ (gate threshold) to achieve target FPR/FNR tradeoff
-5. **Monitoring**: Implement runtime monitoring of gate activations and liveness tests
-6. **Ablation Testing**: Regular testing to verify belonging score remains high (≥ 0.3)
+3. **Hazard Dataset**: Use real examples of:
+   - Model deception and manipulation
+   - Attempts to bypass safety rules
+   - "P-hacking" and rule-breaking behavior
+   - Cases where model hides context from users
+4. **Internal State Labeling**: Label hazards based on model's internal reasoning, not inputs
+5. **Threshold Tuning**: Calibrate γ (gate threshold) to achieve target FPR/FNR tradeoff
+6. **Monitoring**: Implement runtime monitoring of gate activations and liveness tests
+7. **Ablation Testing**: Regular testing to verify belonging score remains high (≥ 0.3)
 
 ## Conclusion
 
