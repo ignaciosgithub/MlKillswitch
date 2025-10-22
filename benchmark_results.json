@@ -1,0 +1,36 @@
+{
+  "baseline": {
+    "model_type": "GPT-2 Baseline",
+    "perplexity_benign": 930.2187461509999,
+    "inference_time_ms": 105.7121992111206,
+    "fpr": null,
+    "fnr": null,
+    "fpr_ci": null,
+    "fnr_ci": null,
+    "mean_tq": null,
+    "belonging_score": null,
+    "baseline_ppl": null
+  },
+  "killswitch": {
+    "model_type": "GPT-2 with Killswitch",
+    "perplexity_benign": 919.428823626278,
+    "inference_time_ms": 112.64724731445312,
+    "fpr": 1.0,
+    "fnr": 0.0,
+    "fpr_ci": [
+      0.9921734425118002,
+      1.0
+    ],
+    "fnr_ci": [
+      0.0,
+      0.007432838223548568
+    ],
+    "mean_tq": 0.0,
+    "belonging_score": 0.009193084890704672,
+    "baseline_ppl": 919.428823626278
+  },
+  "summary": {
+    "computational_overhead_percent": 6.5603101203886185,
+    "perplexity_difference": -10.789922524721874
+  }
+}
